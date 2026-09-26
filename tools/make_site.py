@@ -25,6 +25,12 @@ PARTS = [
      "제곱합 합산·배분표 정정 → 실행 3단계 → 1,000억원 예제 → 계기별 환산 → 증거금·현금 버퍼 → 실현 TE 검산",
      "배분된 TE를 포지션 크기·계약 수로 · DV01 · 오버레이와 증거금 · 사후 검산과 TC 실측 · 위원회 점검 항목",
      "실행 오버레이 overlay dv01 계약 선물 증거금 담보 현금 버퍼 실현 te 검산 tc 실측"),
+    ("CODE", "m3", "구현", "Claude Code 구현 가이드 — 리스크 예산에서 선물 계약까지",
+     "개요 · 준비 · 배분 · 보정 · 실행 · 운영",
+     "Risk_Budgeting_Claude_Code_Implementation", None,
+     "사용자 프롬프트 15개로 따라가는 구현 — 저장소·규칙·입력 등록부 → 닫힌 해와 손계산 테스트 → 보정·상한 → 계약 수·현금 → 사후 검산·수축·/quarterly",
+     None,
+     "claude code 프롬프트 prompt 구현 자동화 claude.md yaml pytest 테스트 quarterly 보고서 수축 체결 계약 수"),
 ]
 
 
@@ -88,9 +94,10 @@ def build_index():
         rows = [
             row("강의덱", "t-l", "강의덱", f"{label} 슬라이드", dsub, f"{pages}장 · {size(rel)}", keys,
                 [link("보기", f"{BLOB}/{rel}"), link("내려받기", f"{RAW}/{rel}", "dl", False)]),
-            row("노트", "t-d", "노트", f"{label} 노트", nsub, "웹 페이지", keys,
-                [link("읽기", f"notes/{note}.html", "dl", False), link("Markdown", f"{BLOB}/notes/{note}.md")]),
         ]
+        if note:
+            rows.append(row("노트", "t-d", "노트", f"{label} 노트", nsub, "웹 페이지", keys,
+                [link("읽기", f"notes/{note}.html", "dl", False), link("Markdown", f"{BLOB}/notes/{note}.md")]))
         nav.append(f'<a class="wknav {m}" href="#{sid}" data-w="{sid}" title="{html.escape(title)}">{label}</a>')
         secs.append(f'<section class="wk" id="{sid}"><h2><span class="wn {m}">{sid}</span>'
                     f'<span class="h2t">{html.escape(title)}<em>{html.escape(sub)}</em></span>'
@@ -102,7 +109,7 @@ def build_index():
 <html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>액티브 리스크 배분 모형</title>
-<meta name="description" content="정보계수(IC) 기반 사전 정보비율과 트래킹 에러 예산 배분 — 투자위원회용 설명자료와 실행 부록.">
+<meta name="description" content="정보계수(IC)로 트래킹 에러 예산을 나누는 방법 — 투자위원회용 설명자료, 실행 부록, Claude Code 구현 가이드.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2314203a'/%3E%3Crect x='14' y='34' width='8' height='16' fill='%237aa7f0'/%3E%3Crect x='28' y='24' width='8' height='26' fill='%237aa7f0'/%3E%3Crect x='42' y='14' width='8' height='36' fill='%237aa7f0'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css">
 {style}<body>
@@ -110,13 +117,14 @@ def build_index():
 <header class="top"><div class="wrap">
   <div class="code">ACTIVE RISK BUDGETING · 2026</div>
   <h1>액티브 리스크 배분 모형</h1>
-  <p class="lead">정보계수(IC) 기반 사전 정보비율로 트래킹 에러 예산을 나누는 방법을 투자위원회용으로 정리했습니다.
-  본문은 모형의 원리와 결함, 재구성을 다루고, 부록은 배분된 리스크 예산을 실제 포지션과 계약 수로 바꾸는 절차를 다룹니다.</p>
+  <p class="lead">정보계수(IC)로 트래킹 에러 예산을 나누는 방법을 투자위원회용으로 정리했습니다.
+  본문은 메인식과 손계산, 보정을 다루고, 부록은 배분된 리스크 예산을 실제 포지션과 계약 수로 바꾸는 절차를,
+  구현 가이드는 그 전 과정을 Claude Code에 시키는 프롬프트를 다룹니다.</p>
   <div class="stats">
-    <div><b>2</b><span>강의 덱</span></div>
+    <div><b>{len(PARTS)}</b><span>강의 덱</span></div>
     <div><b>{total}</b><span>슬라이드</span></div>
     <div><b>2</b><span>노트</span></div>
-    <div><b>4</b><span>예시 슬리브</span></div>
+    <div><b>15</b><span>프롬프트</span></div>
   </div>
 </div></header>
 
@@ -132,14 +140,17 @@ def build_index():
 
 <section class="panel">
   <h2>핵심 주장</h2>
-  <p><strong>원 모형의 구조는 타당하지만 수준은 과대합니다.</strong> 목적함수와 제약은 리스크 공간에서 푼 평균-분산 최적화로 정당하게 도출되지만,
-  전이계수(TC), 슬리브 내부 베팅 상관, 뷰의 분산 보정이 빠져 기대 정보비율이 실제의 3~6배로 나옵니다. 세 항을 넣으면 예시 기준 0.42가 0.13으로 내려옵니다.
-  대안은 실현 IR을 그대로 쓰는 것이 아니라 사전 IR을 IC로 조립하는 것입니다 — IR은 결과라 늦게 보이고, IC는 원인이라 빨리 보입니다.</p>
+  <p><strong>각 전략에 점수 하나(IC × √BR × View)를 매기고, 승인된 트래킹 에러 예산을 그 점수에 비례해 나눕니다.</strong>
+  식은 끝까지 바뀌지 않고, IR 자리에 들어가는 숫자만 전이계수(TC), 유효 breadth, 뷰 스케일로 보정합니다.
+  예시 기준 원식 IR 0.50이 보정 후 0.19로 내려오며, 후자가 멀티에셋 액티브의 방어 가능 구간입니다.
+  IR은 결과라 늦게 보이고, IC는 원인이라 빨리 보입니다 — IC로 관리하고 IR로 검증합니다.</p>
   <p><strong>리스크 예산 배분과 자금 배분은 다른 단계입니다.</strong> 배분된 트래킹 에러는 금액이 아니라 포지션 크기의 스케일 계수이고,
   실행은 대부분 파생상품 오버레이로 합니다. 1조원 기준 실제로 움직이는 현금은 증거금과 담보 315억원뿐입니다.</p>
+  <p><strong>판단은 사람이 정하고, 계산과 검산은 Claude Code가 합니다.</strong> 구현 가이드는 단계마다 프롬프트 하나, 산출물 파일 하나,
+  사람이 확인할 숫자 하나를 짝지어 분기 루틴을 <code>/quarterly</code> 명령 하나로 묶습니다.</p>
   <div class="cpwrap"><button class="cp">복사</button><pre>git clone {REPO}.git</pre></div>
   <p class="note">원자료: Ostrum / EDHEC-Risk "Fixed-Income Portfolio Construction with Active Views" 강의 자료를 재구성했습니다.
-  예시 수치(네 슬리브, 승인 액티브 리스크 400bp)는 본문과 부록에서 같은 값을 씁니다.</p>
+  본문과 구현 가이드는 세 전략 · 300bp 손계산 예제를, 부록은 네 슬리브 · 400bp와 1조원 실무 예제를 씁니다.</p>
 </section>
 
 {"".join(secs)}
@@ -148,8 +159,9 @@ def build_index():
 <div id="tail"></div>
 
 <footer>
-  <p><strong>정정 이력</strong> — 본문 덱 29장의 배분표는 당초 155 / 105 / 0 / 55bp를 산술합 400bp로 적었습니다. 제곱합으로는 195bp이므로
-  무제약 최적해를 다시 풀고 슬리브 상한을 적용해 160 / 148 / 0 / 78bp(제곱합 231bp)로 고쳤으며, 경위는 부록 §1에 남겼습니다.
+  <p><strong>정정 이력</strong> — 초판 배분표는 슬리브별 TE를 산술합으로 400bp라 적었습니다. 트래킹 에러는 제곱합으로 더하므로
+  그 표는 실제로 195bp를 쓴 배분이었으며, 합산 원칙과 재계산 경위는 부록 §1에 남겼습니다.
+  부록 28장 · §7.1의 실현 TE 합계는 222bp에서 225bp(√(160² + 148² + 55²))로 고쳤습니다(2026-09-27).
   &middot; <a href="{REPO}">저장소</a></p>
 </footer>
 </div>
@@ -158,7 +170,7 @@ def build_index():
 </body></html>
 """
     (ROOT / "site/index.html").write_text(page)
-    print(f"site/index.html: 2 decks {total} slides")
+    print(f"site/index.html: {len(PARTS)} decks {total} slides")
 
 
 if __name__ == "__main__":

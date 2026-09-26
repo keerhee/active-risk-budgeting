@@ -2,7 +2,7 @@
 <html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>액티브 리스크 배분 모형</title>
-<meta name="description" content="정보계수(IC) 기반 사전 정보비율과 트래킹 에러 예산 배분 — 투자위원회용 설명자료와 실행 부록.">
+<meta name="description" content="정보계수(IC)로 트래킹 에러 예산을 나누는 방법 — 투자위원회용 설명자료, 실행 부록, Claude Code 구현 가이드.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2314203a'/%3E%3Crect x='14' y='34' width='8' height='16' fill='%237aa7f0'/%3E%3Crect x='28' y='24' width='8' height='26' fill='%237aa7f0'/%3E%3Crect x='42' y='14' width='8' height='36' fill='%237aa7f0'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css">
 <style>
@@ -126,13 +126,14 @@ footer a,.panel a{color:var(--accent)}
 <header class="top"><div class="wrap">
   <div class="code">ACTIVE RISK BUDGETING · 2026</div>
   <h1>액티브 리스크 배분 모형</h1>
-  <p class="lead">정보계수(IC) 기반 사전 정보비율로 트래킹 에러 예산을 나누는 방법을 투자위원회용으로 정리했습니다.
-  본문은 모형의 원리와 결함, 재구성을 다루고, 부록은 배분된 리스크 예산을 실제 포지션과 계약 수로 바꾸는 절차를 다룹니다.</p>
+  <p class="lead">정보계수(IC)로 트래킹 에러 예산을 나누는 방법을 투자위원회용으로 정리했습니다.
+  본문은 메인식과 손계산, 보정을 다루고, 부록은 배분된 리스크 예산을 실제 포지션과 계약 수로 바꾸는 절차를,
+  구현 가이드는 그 전 과정을 Claude Code에 시키는 프롬프트를 다룹니다.</p>
   <div class="stats">
-    <div><b>2</b><span>강의 덱</span></div>
-    <div><b>71</b><span>슬라이드</span></div>
+    <div><b>3</b><span>강의 덱</span></div>
+    <div><b>105</b><span>슬라이드</span></div>
     <div><b>2</b><span>노트</span></div>
-    <div><b>4</b><span>예시 슬리브</span></div>
+    <div><b>15</b><span>프롬프트</span></div>
   </div>
 </div></header>
 
@@ -141,31 +142,35 @@ footer a,.panel a{color:var(--accent)}
     <input id="q" type="search" placeholder="검색 — 예: 전이계수, breadth, DV01, 증거금" autocomplete="off">
     <button class="chip" data-f="" aria-pressed="true">전체</button><button class="chip" data-f="강의덱" aria-pressed="false">강의덱</button><button class="chip" data-f="노트" aria-pressed="false">노트</button>
   </div>
-  <nav class="r2"><a class="wknav m1" href="#MAIN" data-w="MAIN" title="액티브 리스크 배분 모형 — IC로 트래킹 에러 예산을 나눈다">본문</a><a class="wknav m2" href="#APPX" data-w="APPX" title="부록 — 리스크 예산에서 실제 실행까지">부록</a></nav>
+  <nav class="r2"><a class="wknav m1" href="#MAIN" data-w="MAIN" title="액티브 리스크 배분 모형 — IC로 트래킹 에러 예산을 나눈다">본문</a><a class="wknav m2" href="#APPX" data-w="APPX" title="부록 — 리스크 예산에서 실제 실행까지">부록</a><a class="wknav m3" href="#CODE" data-w="CODE" title="Claude Code 구현 가이드 — 리스크 예산에서 선물 계약까지">구현</a></nav>
 </div></div>
 
 <div class="wrap">
 
 <section class="panel">
   <h2>핵심 주장</h2>
-  <p><strong>원 모형의 구조는 타당하지만 수준은 과대합니다.</strong> 목적함수와 제약은 리스크 공간에서 푼 평균-분산 최적화로 정당하게 도출되지만,
-  전이계수(TC), 슬리브 내부 베팅 상관, 뷰의 분산 보정이 빠져 기대 정보비율이 실제의 3~6배로 나옵니다. 세 항을 넣으면 예시 기준 0.42가 0.13으로 내려옵니다.
-  대안은 실현 IR을 그대로 쓰는 것이 아니라 사전 IR을 IC로 조립하는 것입니다 — IR은 결과라 늦게 보이고, IC는 원인이라 빨리 보입니다.</p>
+  <p><strong>각 전략에 점수 하나(IC × √BR × View)를 매기고, 승인된 트래킹 에러 예산을 그 점수에 비례해 나눕니다.</strong>
+  식은 끝까지 바뀌지 않고, IR 자리에 들어가는 숫자만 전이계수(TC), 유효 breadth, 뷰 스케일로 보정합니다.
+  예시 기준 원식 IR 0.50이 보정 후 0.19로 내려오며, 후자가 멀티에셋 액티브의 방어 가능 구간입니다.
+  IR은 결과라 늦게 보이고, IC는 원인이라 빨리 보입니다 — IC로 관리하고 IR로 검증합니다.</p>
   <p><strong>리스크 예산 배분과 자금 배분은 다른 단계입니다.</strong> 배분된 트래킹 에러는 금액이 아니라 포지션 크기의 스케일 계수이고,
   실행은 대부분 파생상품 오버레이로 합니다. 1조원 기준 실제로 움직이는 현금은 증거금과 담보 315억원뿐입니다.</p>
+  <p><strong>판단은 사람이 정하고, 계산과 검산은 Claude Code가 합니다.</strong> 구현 가이드는 단계마다 프롬프트 하나, 산출물 파일 하나,
+  사람이 확인할 숫자 하나를 짝지어 분기 루틴을 <code>/quarterly</code> 명령 하나로 묶습니다.</p>
   <div class="cpwrap"><button class="cp">복사</button><pre>git clone https://github.com/keerhee/active-risk-budgeting.git</pre></div>
   <p class="note">원자료: Ostrum / EDHEC-Risk "Fixed-Income Portfolio Construction with Active Views" 강의 자료를 재구성했습니다.
-  예시 수치(네 슬리브, 승인 액티브 리스크 400bp)는 본문과 부록에서 같은 값을 씁니다.</p>
+  본문과 구현 가이드는 세 전략 · 300bp 손계산 예제를, 부록은 네 슬리브 · 400bp와 1조원 실무 예제를 씁니다.</p>
 </section>
 
-<section class="wk" id="MAIN"><h2><span class="wn m1">MAIN</span><span class="h2t">액티브 리스크 배분 모형 — IC로 트래킹 에러 예산을 나눈다<em>메인식 · 손계산 · 배경 · 보정 · 심화 · 운영</em></span><span class="cnt">2</span></h2><ul class="list"><li class="row" data-k="본문 슬라이드 원자료 최적화식 → 전략 3개·300bp 손계산 → flam·뷰에서 알파로 → tc·유효 breadth·뷰 스케일 보정 → 층위 문제 → 승인·사후 루프 ic 정보계수 ir 정보비율 flam fundamental law breadth 전이계수 tc 트래킹 에러 te 최적화 손계산 view 확신도 natixis ostrum edhec" data-t="강의덱"><span class="tag t-l">강의덱</span><span class="ttl">본문 슬라이드<em>원자료 최적화식 → 전략 3개·300bp 손계산 → FLAM·뷰에서 알파로 → TC·유효 breadth·뷰 스케일 보정 → 층위 문제 → 승인·사후 루프</em></span><span class="meta">38장 · 1.4 MB</span><span class="acts"><a class="act vw" href="https://github.com/keerhee/active-risk-budgeting/blob/main/decks/Active_Risk_Budgeting_IC_Framework.pdf" target="_blank" rel="noopener">보기</a><a class="act dl" href="https://github.com/keerhee/active-risk-budgeting/raw/main/decks/Active_Risk_Budgeting_IC_Framework.pdf">내려받기</a></span></li><li class="row" data-k="본문 노트 덱의 전체 서술본 · 메인식과 네 줄짜리 해 · 3-4-5 손계산 · 보정 후 ir 0.50→0.19 · ic 집계 포화 · 사후 ic 수축 루프 ic 정보계수 ir 정보비율 flam fundamental law breadth 전이계수 tc 트래킹 에러 te 최적화 손계산 view 확신도 natixis ostrum edhec" data-t="노트"><span class="tag t-d">노트</span><span class="ttl">본문 노트<em>덱의 전체 서술본 · 메인식과 네 줄짜리 해 · 3-4-5 손계산 · 보정 후 IR 0.50→0.19 · IC 집계 포화 · 사후 IC 수축 루프</em></span><span class="meta">웹 페이지</span><span class="acts"><a class="act dl" href="notes/Risk_Budgeting_IC_Framework.html">읽기</a><a class="act vw" href="https://github.com/keerhee/active-risk-budgeting/blob/main/notes/Risk_Budgeting_IC_Framework.md" target="_blank" rel="noopener">Markdown</a></span></li></ul></section><section class="wk" id="APPX"><h2><span class="wn m2">APPX</span><span class="h2t">부록 — 리스크 예산에서 실제 실행까지<em>원칙 · 절차 · 예제 · 환산 · 현금 · 검증</em></span><span class="cnt">2</span></h2><ul class="list"><li class="row" data-k="부록 슬라이드 제곱합 합산·배분표 정정 → 실행 3단계 → 1,000억원 예제 → 계기별 환산 → 증거금·현금 버퍼 → 실현 te 검산 실행 오버레이 overlay dv01 계약 선물 증거금 담보 현금 버퍼 실현 te 검산 tc 실측" data-t="강의덱"><span class="tag t-l">강의덱</span><span class="ttl">부록 슬라이드<em>제곱합 합산·배분표 정정 → 실행 3단계 → 1,000억원 예제 → 계기별 환산 → 증거금·현금 버퍼 → 실현 TE 검산</em></span><span class="meta">33장 · 1.2 MB</span><span class="acts"><a class="act vw" href="https://github.com/keerhee/active-risk-budgeting/blob/main/decks/Risk_Budgeting_Implementation_Appendix.pdf" target="_blank" rel="noopener">보기</a><a class="act dl" href="https://github.com/keerhee/active-risk-budgeting/raw/main/decks/Risk_Budgeting_Implementation_Appendix.pdf">내려받기</a></span></li><li class="row" data-k="부록 노트 배분된 te를 포지션 크기·계약 수로 · dv01 · 오버레이와 증거금 · 사후 검산과 tc 실측 · 위원회 점검 항목 실행 오버레이 overlay dv01 계약 선물 증거금 담보 현금 버퍼 실현 te 검산 tc 실측" data-t="노트"><span class="tag t-d">노트</span><span class="ttl">부록 노트<em>배분된 TE를 포지션 크기·계약 수로 · DV01 · 오버레이와 증거금 · 사후 검산과 TC 실측 · 위원회 점검 항목</em></span><span class="meta">웹 페이지</span><span class="acts"><a class="act dl" href="notes/Risk_Budgeting_Implementation_Appendix.html">읽기</a><a class="act vw" href="https://github.com/keerhee/active-risk-budgeting/blob/main/notes/Risk_Budgeting_Implementation_Appendix.md" target="_blank" rel="noopener">Markdown</a></span></li></ul></section>
+<section class="wk" id="MAIN"><h2><span class="wn m1">MAIN</span><span class="h2t">액티브 리스크 배분 모형 — IC로 트래킹 에러 예산을 나눈다<em>메인식 · 손계산 · 배경 · 보정 · 심화 · 운영</em></span><span class="cnt">2</span></h2><ul class="list"><li class="row" data-k="본문 슬라이드 원자료 최적화식 → 전략 3개·300bp 손계산 → flam·뷰에서 알파로 → tc·유효 breadth·뷰 스케일 보정 → 층위 문제 → 승인·사후 루프 ic 정보계수 ir 정보비율 flam fundamental law breadth 전이계수 tc 트래킹 에러 te 최적화 손계산 view 확신도 natixis ostrum edhec" data-t="강의덱"><span class="tag t-l">강의덱</span><span class="ttl">본문 슬라이드<em>원자료 최적화식 → 전략 3개·300bp 손계산 → FLAM·뷰에서 알파로 → TC·유효 breadth·뷰 스케일 보정 → 층위 문제 → 승인·사후 루프</em></span><span class="meta">38장 · 1.4 MB</span><span class="acts"><a class="act vw" href="https://github.com/keerhee/active-risk-budgeting/blob/main/decks/Active_Risk_Budgeting_IC_Framework.pdf" target="_blank" rel="noopener">보기</a><a class="act dl" href="https://github.com/keerhee/active-risk-budgeting/raw/main/decks/Active_Risk_Budgeting_IC_Framework.pdf">내려받기</a></span></li><li class="row" data-k="본문 노트 덱의 전체 서술본 · 메인식과 네 줄짜리 해 · 3-4-5 손계산 · 보정 후 ir 0.50→0.19 · ic 집계 포화 · 사후 ic 수축 루프 ic 정보계수 ir 정보비율 flam fundamental law breadth 전이계수 tc 트래킹 에러 te 최적화 손계산 view 확신도 natixis ostrum edhec" data-t="노트"><span class="tag t-d">노트</span><span class="ttl">본문 노트<em>덱의 전체 서술본 · 메인식과 네 줄짜리 해 · 3-4-5 손계산 · 보정 후 IR 0.50→0.19 · IC 집계 포화 · 사후 IC 수축 루프</em></span><span class="meta">웹 페이지</span><span class="acts"><a class="act dl" href="notes/Risk_Budgeting_IC_Framework.html">읽기</a><a class="act vw" href="https://github.com/keerhee/active-risk-budgeting/blob/main/notes/Risk_Budgeting_IC_Framework.md" target="_blank" rel="noopener">Markdown</a></span></li></ul></section><section class="wk" id="APPX"><h2><span class="wn m2">APPX</span><span class="h2t">부록 — 리스크 예산에서 실제 실행까지<em>원칙 · 절차 · 예제 · 환산 · 현금 · 검증</em></span><span class="cnt">2</span></h2><ul class="list"><li class="row" data-k="부록 슬라이드 제곱합 합산·배분표 정정 → 실행 3단계 → 1,000억원 예제 → 계기별 환산 → 증거금·현금 버퍼 → 실현 te 검산 실행 오버레이 overlay dv01 계약 선물 증거금 담보 현금 버퍼 실현 te 검산 tc 실측" data-t="강의덱"><span class="tag t-l">강의덱</span><span class="ttl">부록 슬라이드<em>제곱합 합산·배분표 정정 → 실행 3단계 → 1,000억원 예제 → 계기별 환산 → 증거금·현금 버퍼 → 실현 TE 검산</em></span><span class="meta">33장 · 1.2 MB</span><span class="acts"><a class="act vw" href="https://github.com/keerhee/active-risk-budgeting/blob/main/decks/Risk_Budgeting_Implementation_Appendix.pdf" target="_blank" rel="noopener">보기</a><a class="act dl" href="https://github.com/keerhee/active-risk-budgeting/raw/main/decks/Risk_Budgeting_Implementation_Appendix.pdf">내려받기</a></span></li><li class="row" data-k="부록 노트 배분된 te를 포지션 크기·계약 수로 · dv01 · 오버레이와 증거금 · 사후 검산과 tc 실측 · 위원회 점검 항목 실행 오버레이 overlay dv01 계약 선물 증거금 담보 현금 버퍼 실현 te 검산 tc 실측" data-t="노트"><span class="tag t-d">노트</span><span class="ttl">부록 노트<em>배분된 TE를 포지션 크기·계약 수로 · DV01 · 오버레이와 증거금 · 사후 검산과 TC 실측 · 위원회 점검 항목</em></span><span class="meta">웹 페이지</span><span class="acts"><a class="act dl" href="notes/Risk_Budgeting_Implementation_Appendix.html">읽기</a><a class="act vw" href="https://github.com/keerhee/active-risk-budgeting/blob/main/notes/Risk_Budgeting_Implementation_Appendix.md" target="_blank" rel="noopener">Markdown</a></span></li></ul></section><section class="wk" id="CODE"><h2><span class="wn m3">CODE</span><span class="h2t">Claude Code 구현 가이드 — 리스크 예산에서 선물 계약까지<em>개요 · 준비 · 배분 · 보정 · 실행 · 운영</em></span><span class="cnt">1</span></h2><ul class="list"><li class="row" data-k="구현 슬라이드 사용자 프롬프트 15개로 따라가는 구현 — 저장소·규칙·입력 등록부 → 닫힌 해와 손계산 테스트 → 보정·상한 → 계약 수·현금 → 사후 검산·수축·/quarterly claude code 프롬프트 prompt 구현 자동화 claude.md yaml pytest 테스트 quarterly 보고서 수축 체결 계약 수" data-t="강의덱"><span class="tag t-l">강의덱</span><span class="ttl">구현 슬라이드<em>사용자 프롬프트 15개로 따라가는 구현 — 저장소·규칙·입력 등록부 → 닫힌 해와 손계산 테스트 → 보정·상한 → 계약 수·현금 → 사후 검산·수축·/quarterly</em></span><span class="meta">34장 · 577 KB</span><span class="acts"><a class="act vw" href="https://github.com/keerhee/active-risk-budgeting/blob/main/decks/Risk_Budgeting_Claude_Code_Implementation.pdf" target="_blank" rel="noopener">보기</a><a class="act dl" href="https://github.com/keerhee/active-risk-budgeting/raw/main/decks/Risk_Budgeting_Claude_Code_Implementation.pdf">내려받기</a></span></li></ul></section>
 
 <div id="empty" class="empty hide">검색 결과가 없습니다.</div>
 <div id="tail"></div>
 
 <footer>
-  <p><strong>정정 이력</strong> — 본문 덱 29장의 배분표는 당초 155 / 105 / 0 / 55bp를 산술합 400bp로 적었습니다. 제곱합으로는 195bp이므로
-  무제약 최적해를 다시 풀고 슬리브 상한을 적용해 160 / 148 / 0 / 78bp(제곱합 231bp)로 고쳤으며, 경위는 부록 §1에 남겼습니다.
+  <p><strong>정정 이력</strong> — 초판 배분표는 슬리브별 TE를 산술합으로 400bp라 적었습니다. 트래킹 에러는 제곱합으로 더하므로
+  그 표는 실제로 195bp를 쓴 배분이었으며, 합산 원칙과 재계산 경위는 부록 §1에 남겼습니다.
+  부록 28장 · §7.1의 실현 TE 합계는 222bp에서 225bp(√(160² + 148² + 55²))로 고쳤습니다(2026-09-27).
   &middot; <a href="https://github.com/keerhee/active-risk-budgeting">저장소</a></p>
 </footer>
 </div>
