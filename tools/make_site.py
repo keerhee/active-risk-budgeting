@@ -13,12 +13,12 @@ PAGE_CSS = (pathlib.Path(__file__).with_name("page.css")).read_text()
 
 # 섹션 id, 색, 라벨, 제목, 부제, 덱 파일, 노트 파일, 덱 설명, 노트 설명, 검색어
 PARTS = [
-    ("MAIN", "m1", "본문", "리스크 배분 모형 — IC 기반 사전 IR과 최적화 설계",
-     "개요 · 원리 · 결함 · 재구성 · 적용 · 운영",
+    ("MAIN", "m1", "본문", "액티브 리스크 배분 모형 — IC로 트래킹 에러 예산을 나눈다",
+     "메인식 · 손계산 · 배경 · 보정 · 심화 · 운영",
      "Active_Risk_Budgeting_IC_Framework", "Risk_Budgeting_IC_Framework",
-     "알파·TE·IR 정의 → FLAM·전이계수·결합 IR → 원 모형의 결함 → 사전 IR 조립 → 배분 결과 → 승인·사후 루프",
-     "덱의 전체 서술본 · 원 모형 도출과 결함 · 사전 IR 조립 · 개선된 최적화식 · 사후 IC 수축 루프",
-     "ic 정보계수 ir 정보비율 flam fundamental law breadth 전이계수 tc 트래킹 에러 te 최적화 natixis ostrum edhec"),
+     "원자료 최적화식 → 전략 3개·300bp 손계산 → FLAM·뷰에서 알파로 → TC·유효 breadth·뷰 스케일 보정 → 층위 문제 → 승인·사후 루프",
+     "덱의 전체 서술본 · 메인식과 네 줄짜리 해 · 3-4-5 손계산 · 보정 후 IR 0.50→0.19 · IC 집계 포화 · 사후 IC 수축 루프",
+     "ic 정보계수 ir 정보비율 flam fundamental law breadth 전이계수 tc 트래킹 에러 te 최적화 손계산 view 확신도 natixis ostrum edhec"),
     ("APPX", "m2", "부록", "부록 — 리스크 예산에서 실제 실행까지",
      "원칙 · 절차 · 예제 · 환산 · 현금 · 검증",
      "Risk_Budgeting_Implementation_Appendix", "Risk_Budgeting_Implementation_Appendix",
