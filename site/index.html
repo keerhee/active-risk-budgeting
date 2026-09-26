@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>액티브 리스크 배분 모형</title>
+<meta name="description" content="정보계수(IC) 기반 사전 정보비율과 트래킹 에러 예산 배분 — 투자위원회용 설명자료와 실행 부록.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2314203a'/%3E%3Crect x='14' y='34' width='8' height='16' fill='%237aa7f0'/%3E%3Crect x='28' y='24' width='8' height='26' fill='%237aa7f0'/%3E%3Crect x='42' y='14' width='8' height='36' fill='%237aa7f0'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#14203a;--dim:#5b6880;--line:#dde2ea;
+ --navy:#14203a;--accent:#1f4e9c;--chip:#eef2f8;--code:#f2f4f8;
+ --t-l:#1f4e9c;--t-p:#0e7c5a;--t-c:#8a3f14;--t-d:#5b3a8f;--t-k:#8a1f4a;--t-r:#0f6b7a;--t-s:#9a5b00;
+ --m1:#1f4e9c;--m2:#0e7c5a;--m3:#8a3f14;--m4:#5b3a8f;
+ --m1b:#e8effa;--m2b:#e2f4ed;--m3b:#f8ede4;--m4b:#efe9fa}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --bg:#0d1220;--panel:#161d2e;--ink:#e8ecf4;--dim:#94a2ba;--line:#28324a;
+ --navy:#e8ecf4;--accent:#7aa7f0;--chip:#1e2740;--code:#111827;
+ --t-l:#7aa7f0;--t-p:#4fc79b;--t-c:#e0a06a;--t-d:#b295e8;--t-k:#e88bb0;--t-r:#5cc4d6;--t-s:#e3b84f;
+ --m1:#7aa7f0;--m2:#4fc79b;--m3:#e0a06a;--m4:#b295e8;
+ --m1b:#1a2740;--m2b:#12302a;--m3b:#33241a;--m4b:#271f3d}}
+:root[data-theme="dark"]{
+ --bg:#0d1220;--panel:#161d2e;--ink:#e8ecf4;--dim:#94a2ba;--line:#28324a;
+ --navy:#e8ecf4;--accent:#7aa7f0;--chip:#1e2740;--code:#111827;
+ --t-l:#7aa7f0;--t-p:#4fc79b;--t-c:#e0a06a;--t-d:#b295e8;--t-k:#e88bb0;--t-r:#5cc4d6;--t-s:#e3b84f;
+ --m1:#7aa7f0;--m2:#4fc79b;--m3:#e0a06a;--m4:#b295e8;
+ --m1b:#1a2740;--m2b:#12302a;--m3b:#33241a;--m4b:#271f3d}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:16px/1.65 Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",sans-serif;word-break:keep-all}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+header.top{background:#14203a;color:#fff;padding:40px 0 30px}
+:root[data-theme="dark"] header.top,
+:root:not([data-theme="light"]) header.top{background:#101728}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) header.top{background:#14203a}}
+header.top .wrap{padding-bottom:0}
+.code{font:600 13px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;color:#9fb6de;margin-bottom:10px}
+h1{margin:0 0 8px;font-size:32px;letter-spacing:-.02em;color:#fff}
+.lead{margin:0;color:#c3d0e6;font-size:15px;max-width:66ch}
+.stats{display:flex;gap:26px;margin-top:22px;flex-wrap:wrap}
+.stats>div{display:flex;flex-direction:column}
+.stats>div>b{font-size:24px;font-weight:700;color:#fff;line-height:1.2}
+.stats>div>span{font-size:12px;color:#9fb6de;letter-spacing:.04em}
+.bar{position:sticky;top:0;z-index:9;background:var(--bg);border-bottom:1px solid var(--line);
+ padding:10px 0 8px;margin-bottom:24px}
+.bar .wrap{padding-bottom:0;display:flex;flex-direction:column;gap:8px}
+.r1{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.r2{display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin;padding-bottom:1px}
+.r2::-webkit-scrollbar{height:4px}
+.r2::-webkit-scrollbar-thumb{background:var(--line);border-radius:2px}
+#q{flex:1;min-width:200px;padding:9px 13px;border:1px solid var(--line);border-radius:8px;
+ background:var(--panel);color:var(--ink);font-size:14px}
+#q:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.chip{padding:7px 13px;border:1px solid var(--line);border-radius:20px;background:var(--panel);
+ color:var(--dim);font-size:13px;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.wknav{padding:5px 9px;border-radius:6px;text-decoration:none;white-space:nowrap;flex:none;
+ font:600 12px/1 ui-monospace,Menlo,monospace;border:1px solid transparent}
+.wknav.m1{background:var(--m1b);color:var(--m1)}
+.wknav.m2{background:var(--m2b);color:var(--m2)}
+.wknav.m3{background:var(--m3b);color:var(--m3)}
+.wknav.m4{background:var(--m4b);color:var(--m4)}
+.wknav:hover{border-color:currentColor}
+.wknav.on{color:#fff}
+.wknav.m1.on{background:var(--m1)}.wknav.m2.on{background:var(--m2)}
+.wknav.m3.on{background:var(--m3)}.wknav.m4.on{background:var(--m4)}
+:root[data-theme="dark"] .wknav.on,
+:root:not([data-theme="light"]) .wknav.on{color:#0d1220}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .wknav.on{color:#fff}}
+.wknav.dim{opacity:.3}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px 24px;margin-bottom:22px}
+.panel h2{margin:0 0 6px;font-size:19px;letter-spacing:-.01em}
+.panel p{margin:0 0 14px;color:var(--dim);font-size:14.5px;max-width:74ch}
+pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:0 0 14px;
+ overflow-x:auto;font:13px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink)}
+.cpwrap{position:relative}
+.cp{position:absolute;top:8px;right:8px;border:1px solid var(--line);background:var(--panel);color:var(--dim);
+ border-radius:6px;padding:4px 9px;font-size:12px;cursor:pointer}
+.cp:hover{color:var(--accent);border-color:var(--accent)}
+table.ser{width:100%;border-collapse:collapse;font-size:13.5px;margin-bottom:6px}
+table.ser th,table.ser td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.ser th{color:var(--dim);font-weight:600;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+table.ser code{background:var(--chip);padding:1px 5px;border-radius:4px;font-size:12.5px}
+.tblscroll{overflow-x:auto}
+.note{font-size:13.5px;color:var(--dim);margin:0}
+.wk{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:14px;
+ overflow:hidden;scroll-margin-top:104px}
+.wk h2{display:flex;align-items:center;gap:12px;margin:0;padding:14px 18px;border-bottom:1px solid var(--line);
+ font-size:16px;font-weight:650;letter-spacing:-.01em}
+.wn{font:700 12px/1 ui-monospace,Menlo,monospace;background:var(--chip);color:var(--accent);
+ padding:6px 8px;border-radius:6px;flex:none}
+.wn.m1{background:var(--m1b);color:var(--m1)}
+.wn.m2{background:var(--m2b);color:var(--m2)}
+.wn.m3{background:var(--m3b);color:var(--m3)}
+.wn.m4{background:var(--m4b);color:var(--m4)}
+.wk h2{scroll-margin-top:104px}
+.wk:target h2,.wk.flash h2{background:var(--chip)}
+.h2t{display:flex;flex-direction:column;flex:1;min-width:0}
+.h2t em{font-style:normal;font-size:12px;color:var(--dim);font-weight:400}
+.cnt{font-size:12px;color:var(--dim);flex:none}
+.list{list-style:none;margin:0;padding:0}
+.row{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--line);font-size:14.5px}
+.row:last-child{border-bottom:0}
+.tag{font:600 10px/1 ui-monospace,Menlo,monospace;letter-spacing:.06em;text-transform:uppercase;
+ padding:4px 7px;border-radius:5px;background:var(--chip);flex:none;width:74px;text-align:center}
+.t-l{color:var(--t-l)}.t-p{color:var(--t-p)}.t-c{color:var(--t-c)}.t-d{color:var(--t-d)}.t-k{color:var(--t-k)}.t-r{color:var(--t-r)}.t-s{color:var(--t-s)}.t-u{color:var(--t-r)}
+.ttl{flex:1;min-width:0;display:flex;flex-direction:column}
+.ttl em{font-style:normal;font-size:12.5px;color:var(--dim)}
+.meta{font-size:12px;color:var(--dim);flex:none;white-space:nowrap}
+.acts{display:flex;gap:6px;flex:none}
+.act{font-size:12.5px;text-decoration:none;padding:5px 11px;border-radius:6px;border:1px solid var(--line);white-space:nowrap}
+.vw{color:var(--dim)}.vw:hover{color:var(--accent);border-color:var(--accent)}
+.dl{color:#fff;background:var(--accent);border-color:var(--accent)}
+.dl:hover{filter:brightness(1.1)}
+.hide{display:none!important}
+.empty{padding:40px 0;text-align:center;color:var(--dim)}
+#tail{height:0}
+footer{border-top:1px solid var(--line);padding-top:22px;margin-top:34px;color:var(--dim);font-size:13.5px}
+footer a,.panel a{color:var(--accent)}
+@media(max-width:720px){
+ .row{flex-wrap:wrap;gap:8px}.meta{order:3;width:100%}.acts{order:4}.tag{width:auto}
+ h1{font-size:25px}.stats{gap:18px}
+}
+</style></head>
+<body>
+
+<header class="top"><div class="wrap">
+  <div class="code">ACTIVE RISK BUDGETING · 2026</div>
+  <h1>액티브 리스크 배분 모형</h1>
+  <p class="lead">정보계수(IC) 기반 사전 정보비율로 트래킹 에러 예산을 나누는 방법을 투자위원회용으로 정리했습니다.
+  본문은 모형의 원리와 결함, 재구성을 다루고, 부록은 배분된 리스크 예산을 실제 포지션과 계약 수로 바꾸는 절차를 다룹니다.</p>
+  <div class="stats">
+    <div><b>2</b><span>강의 덱</span></div>
+    <div><b>71</b><span>슬라이드</span></div>
+    <div><b>2</b><span>노트</span></div>
+    <div><b>4</b><span>예시 슬리브</span></div>
+  </div>
+</div></header>
+
+<div class="bar"><div class="wrap">
+  <div class="r1">
+    <input id="q" type="search" placeholder="검색 — 예: 전이계수, breadth, DV01, 증거금" autocomplete="off">
+    <button class="chip" data-f="" aria-pressed="true">전체</button><button class="chip" data-f="강의덱" aria-pressed="false">강의덱</button><button class="chip" data-f="노트" aria-pressed="false">노트</button>
+  </div>
+  <nav class="r2"><a class="wknav m1" href="#MAIN" data-w="MAIN" title="리스크 배분 모형 — IC 기반 사전 IR과 최적화 설계">본문</a><a class="wknav m2" href="#APPX" data-w="APPX" title="부록 — 리스크 예산에서 실제 실행까지">부록</a></nav>
+</div></div>
+
+<div class="wrap">
+
+<section class="panel">
+  <h2>핵심 주장</h2>
+  <p><strong>원 모형의 구조는 타당하지만 수준은 과대합니다.</strong> 목적함수와 제약은 리스크 공간에서 푼 평균-분산 최적화로 정당하게 도출되지만,
+  전이계수(TC), 슬리브 내부 베팅 상관, 뷰의 분산 보정이 빠져 기대 정보비율이 실제의 3~6배로 나옵니다. 세 항을 넣으면 예시 기준 0.42가 0.13으로 내려옵니다.
+  대안은 실현 IR을 그대로 쓰는 것이 아니라 사전 IR을 IC로 조립하는 것입니다 — IR은 결과라 늦게 보이고, IC는 원인이라 빨리 보입니다.</p>
+  <p><strong>리스크 예산 배분과 자금 배분은 다른 단계입니다.</strong> 배분된 트래킹 에러는 금액이 아니라 포지션 크기의 스케일 계수이고,
+  실행은 대부분 파생상품 오버레이로 합니다. 1조원 기준 실제로 움직이는 현금은 증거금과 담보 315억원뿐입니다.</p>
+  <div class="cpwrap"><button class="cp">복사</button><pre>git clone https://github.com/keerhee/active-risk-budgeting.git</pre></div>
+  <p class="note">원자료: Ostrum / EDHEC-Risk "Fixed-Income Portfolio Construction with Active Views" 강의 자료를 재구성했습니다.
+  예시 수치(네 슬리브, 승인 액티브 리스크 400bp)는 본문과 부록에서 같은 값을 씁니다.</p>
+</section>
+
+<section class="wk" id="MAIN"><h2><span class="wn m1">MAIN</span><span class="h2t">리스크 배분 모형 — IC 기반 사전 IR과 최적화 설계<em>개요 · 원리 · 결함 · 재구성 · 적용 · 운영</em></span><span class="cnt">2</span></h2><ul class="list"><li class="row" data-k="본문 슬라이드 알파·te·ir 정의 → flam·전이계수·결합 ir → 원 모형의 결함 → 사전 ir 조립 → 배분 결과 → 승인·사후 루프 ic 정보계수 ir 정보비율 flam fundamental law breadth 전이계수 tc 트래킹 에러 te 최적화 natixis ostrum edhec" data-t="강의덱"><span class="tag t-l">강의덱</span><span class="ttl">본문 슬라이드<em>알파·TE·IR 정의 → FLAM·전이계수·결합 IR → 원 모형의 결함 → 사전 IR 조립 → 배분 결과 → 승인·사후 루프</em></span><span class="meta">38장 · 1.6 MB</span><span class="acts"><a class="act vw" href="https://github.com/keerhee/active-risk-budgeting/blob/main/decks/Active_Risk_Budgeting_IC_Framework.pdf" target="_blank" rel="noopener">보기</a><a class="act dl" href="https://github.com/keerhee/active-risk-budgeting/raw/main/decks/Active_Risk_Budgeting_IC_Framework.pdf">내려받기</a></span></li><li class="row" data-k="본문 노트 덱의 전체 서술본 · 원 모형 도출과 결함 · 사전 ir 조립 · 개선된 최적화식 · 사후 ic 수축 루프 ic 정보계수 ir 정보비율 flam fundamental law breadth 전이계수 tc 트래킹 에러 te 최적화 natixis ostrum edhec" data-t="노트"><span class="tag t-d">노트</span><span class="ttl">본문 노트<em>덱의 전체 서술본 · 원 모형 도출과 결함 · 사전 IR 조립 · 개선된 최적화식 · 사후 IC 수축 루프</em></span><span class="meta">웹 페이지</span><span class="acts"><a class="act dl" href="notes/Risk_Budgeting_IC_Framework.html">읽기</a><a class="act vw" href="https://github.com/keerhee/active-risk-budgeting/blob/main/notes/Risk_Budgeting_IC_Framework.md" target="_blank" rel="noopener">Markdown</a></span></li></ul></section><section class="wk" id="APPX"><h2><span class="wn m2">APPX</span><span class="h2t">부록 — 리스크 예산에서 실제 실행까지<em>원칙 · 절차 · 예제 · 환산 · 현금 · 검증</em></span><span class="cnt">2</span></h2><ul class="list"><li class="row" data-k="부록 슬라이드 제곱합 합산·배분표 정정 → 실행 3단계 → 1,000억원 예제 → 계기별 환산 → 증거금·현금 버퍼 → 실현 te 검산 실행 오버레이 overlay dv01 계약 선물 증거금 담보 현금 버퍼 실현 te 검산 tc 실측" data-t="강의덱"><span class="tag t-l">강의덱</span><span class="ttl">부록 슬라이드<em>제곱합 합산·배분표 정정 → 실행 3단계 → 1,000억원 예제 → 계기별 환산 → 증거금·현금 버퍼 → 실현 TE 검산</em></span><span class="meta">33장 · 1.2 MB</span><span class="acts"><a class="act vw" href="https://github.com/keerhee/active-risk-budgeting/blob/main/decks/Risk_Budgeting_Implementation_Appendix.pdf" target="_blank" rel="noopener">보기</a><a class="act dl" href="https://github.com/keerhee/active-risk-budgeting/raw/main/decks/Risk_Budgeting_Implementation_Appendix.pdf">내려받기</a></span></li><li class="row" data-k="부록 노트 배분된 te를 포지션 크기·계약 수로 · dv01 · 오버레이와 증거금 · 사후 검산과 tc 실측 · 위원회 점검 항목 실행 오버레이 overlay dv01 계약 선물 증거금 담보 현금 버퍼 실현 te 검산 tc 실측" data-t="노트"><span class="tag t-d">노트</span><span class="ttl">부록 노트<em>배분된 TE를 포지션 크기·계약 수로 · DV01 · 오버레이와 증거금 · 사후 검산과 TC 실측 · 위원회 점검 항목</em></span><span class="meta">웹 페이지</span><span class="acts"><a class="act dl" href="notes/Risk_Budgeting_Implementation_Appendix.html">읽기</a><a class="act vw" href="https://github.com/keerhee/active-risk-budgeting/blob/main/notes/Risk_Budgeting_Implementation_Appendix.md" target="_blank" rel="noopener">Markdown</a></span></li></ul></section>
+
+<div id="empty" class="empty hide">검색 결과가 없습니다.</div>
+<div id="tail"></div>
+
+<footer>
+  <p><strong>정정 이력</strong> — 본문 덱 29장의 배분표는 당초 155 / 105 / 0 / 55bp를 산술합 400bp로 적었습니다. 제곱합으로는 195bp이므로
+  무제약 최적해를 다시 풀고 슬리브 상한을 적용해 160 / 148 / 0 / 78bp(제곱합 231bp)로 고쳤으며, 경위는 부록 §1에 남겼습니다.
+  &middot; <a href="https://github.com/keerhee/active-risk-budgeting">저장소</a></p>
+</footer>
+</div>
+
+<script>
+const rows=[...document.querySelectorAll('.row')],secs=[...document.querySelectorAll('.wk')];
+const q=document.getElementById('q'),chips=[...document.querySelectorAll('.chip')];
+let f='';
+function apply(){
+  const t=q.value.trim().toLowerCase();
+  rows.forEach(r=>{
+    const okT=!f||r.dataset.t===f, okQ=!t||r.dataset.k.includes(t);
+    r.classList.toggle('hide',!(okT&&okQ));
+  });
+  let any=false;
+  secs.forEach(s=>{
+    const n=[...s.querySelectorAll('.row')].filter(r=>!r.classList.contains('hide')).length;
+    s.classList.toggle('hide',n===0); if(n)any=true;
+    const c=s.querySelector('.cnt'); if(c)c.textContent=n;
+    const nav=document.querySelector('.wknav[data-w="'+s.id+'"]');
+    if(nav)nav.classList.toggle('dim',n===0);
+  });
+  document.getElementById('empty').classList.toggle('hide',any);
+  if(typeof spy==='function'){sizeTail();spy();}
+}
+q.addEventListener('input',apply);
+chips.forEach(c=>c.addEventListener('click',()=>{
+  f=c.dataset.f; chips.forEach(x=>x.setAttribute('aria-pressed',String(x===c))); apply();
+}));
+document.querySelectorAll('.cp').forEach(b=>b.addEventListener('click',async()=>{
+  const pre=b.parentElement.querySelector('pre');
+  try{await navigator.clipboard.writeText(pre.innerText.trim());
+      const o=b.textContent;b.textContent='복사됨';setTimeout(()=>b.textContent=o,1400);}
+  catch(e){b.textContent='⌘C를 누르세요';setTimeout(()=>b.textContent='복사',1600);}
+}));
+const navs=[...document.querySelectorAll('.wknav')];
+const navFor=id=>navs.find(n=>n.dataset.w===id);
+function setActive(id){navs.forEach(n=>n.classList.toggle('on',n.dataset.w===id));}
+function spy(){
+  const spied=secs.filter(s=>navFor(s.id)&&!s.classList.contains('hide'));
+  if(!spied.length){navs.forEach(n=>n.classList.remove('on'));return;}
+  const line=110;                       // just below the sticky bar
+  let cur=null;
+  for(const s of spied){ if(s.getBoundingClientRect().top<=line) cur=s; else break; }
+  setActive((cur||spied[0]).id);
+}
+const tail=document.getElementById('tail');
+// Without this the last unit cannot be scrolled to the top, so the last two
+// chips land in the same place and the final one never activates.
+function sizeTail(){
+  const spied=secs.filter(s=>navFor(s.id)&&!s.classList.contains('hide'));
+  if(!spied.length){tail.style.height='0px';return;}
+  const last=spied[spied.length-1];
+  const without=document.body.scrollHeight-tail.offsetHeight;
+  const need=last.offsetTop-104+window.innerHeight-without;
+  tail.style.height=Math.max(0,Math.ceil(need))+'px';
+}
+let tick=false;
+function onScroll(){if(tick)return;tick=true;
+  requestAnimationFrame(()=>{spy();tick=false;});}
+addEventListener('scroll',onScroll,{passive:true});
+addEventListener('resize',()=>{sizeTail();onScroll();},{passive:true});
+// Clicking a chip activates it immediately, and briefly marks where you landed.
+navs.forEach(n=>n.addEventListener('click',()=>{
+  setActive(n.dataset.w);
+  const s=document.getElementById(n.dataset.w);
+  if(s){s.classList.add('flash');setTimeout(()=>s.classList.remove('flash'),1200);}
+}));
+sizeTail();
+spy();
+</script>
+
+</body></html>

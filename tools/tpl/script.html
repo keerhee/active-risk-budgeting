@@ -1,0 +1,67 @@
+<script>
+const rows=[...document.querySelectorAll('.row')],secs=[...document.querySelectorAll('.wk')];
+const q=document.getElementById('q'),chips=[...document.querySelectorAll('.chip')];
+let f='';
+function apply(){
+  const t=q.value.trim().toLowerCase();
+  rows.forEach(r=>{
+    const okT=!f||r.dataset.t===f, okQ=!t||r.dataset.k.includes(t);
+    r.classList.toggle('hide',!(okT&&okQ));
+  });
+  let any=false;
+  secs.forEach(s=>{
+    const n=[...s.querySelectorAll('.row')].filter(r=>!r.classList.contains('hide')).length;
+    s.classList.toggle('hide',n===0); if(n)any=true;
+    const c=s.querySelector('.cnt'); if(c)c.textContent=n;
+    const nav=document.querySelector('.wknav[data-w="'+s.id+'"]');
+    if(nav)nav.classList.toggle('dim',n===0);
+  });
+  document.getElementById('empty').classList.toggle('hide',any);
+  if(typeof spy==='function'){sizeTail();spy();}
+}
+q.addEventListener('input',apply);
+chips.forEach(c=>c.addEventListener('click',()=>{
+  f=c.dataset.f; chips.forEach(x=>x.setAttribute('aria-pressed',String(x===c))); apply();
+}));
+document.querySelectorAll('.cp').forEach(b=>b.addEventListener('click',async()=>{
+  const pre=b.parentElement.querySelector('pre');
+  try{await navigator.clipboard.writeText(pre.innerText.trim());
+      const o=b.textContent;b.textContent='Copied';setTimeout(()=>b.textContent=o,1400);}
+  catch(e){b.textContent='Press \\u2318C';setTimeout(()=>b.textContent='Copy',1600);}
+}));
+const navs=[...document.querySelectorAll('.wknav')];
+const navFor=id=>navs.find(n=>n.dataset.w===id);
+function setActive(id){navs.forEach(n=>n.classList.toggle('on',n.dataset.w===id));}
+function spy(){
+  const spied=secs.filter(s=>navFor(s.id)&&!s.classList.contains('hide'));
+  if(!spied.length){navs.forEach(n=>n.classList.remove('on'));return;}
+  const line=110;                       // just below the sticky bar
+  let cur=null;
+  for(const s of spied){ if(s.getBoundingClientRect().top<=line) cur=s; else break; }
+  setActive((cur||spied[0]).id);
+}
+const tail=document.getElementById('tail');
+// Without this the last unit cannot be scrolled to the top, so the last two
+// chips land in the same place and the final one never activates.
+function sizeTail(){
+  const spied=secs.filter(s=>navFor(s.id)&&!s.classList.contains('hide'));
+  if(!spied.length){tail.style.height='0px';return;}
+  const last=spied[spied.length-1];
+  const without=document.body.scrollHeight-tail.offsetHeight;
+  const need=last.offsetTop-104+window.innerHeight-without;
+  tail.style.height=Math.max(0,Math.ceil(need))+'px';
+}
+let tick=false;
+function onScroll(){if(tick)return;tick=true;
+  requestAnimationFrame(()=>{spy();tick=false;});}
+addEventListener('scroll',onScroll,{passive:true});
+addEventListener('resize',()=>{sizeTail();onScroll();},{passive:true});
+// Clicking a chip activates it immediately, and briefly marks where you landed.
+navs.forEach(n=>n.addEventListener('click',()=>{
+  setActive(n.dataset.w);
+  const s=document.getElementById(n.dataset.w);
+  if(s){s.classList.add('flash');setTimeout(()=>s.classList.remove('flash'),1200);}
+}));
+sizeTail();
+spy();
+</script>

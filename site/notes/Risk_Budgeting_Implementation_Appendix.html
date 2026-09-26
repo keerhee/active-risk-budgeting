@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.10.1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="dcterms.date" content="2026-09-25" />
+  <title>부록 — 리스크 예산에서 실제 실행까지</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css">
+  <style>
+  :root{--bg:#f6f7f9;--panel:#fff;--ink:#14203a;--dim:#5b6880;--line:#dde2ea;--accent:#1f4e9c;--chip:#eef2f8;--code:#f2f4f8}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1220;--panel:#161d2e;--ink:#e8ecf4;--dim:#94a2ba;--line:#28324a;--accent:#7aa7f0;--chip:#1e2740;--code:#111827}}
+  :root[data-theme="dark"]{--bg:#0d1220;--panel:#161d2e;--ink:#e8ecf4;--dim:#94a2ba;--line:#28324a;--accent:#7aa7f0;--chip:#1e2740;--code:#111827}
+  *{box-sizing:border-box}
+  body{margin:0;max-width:none;padding:0;hyphens:manual;background:var(--bg);color:var(--ink);font:17px/1.8 Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif;word-break:keep-all}
+  .topbar{background:#14203a;color:#c3d0e6;padding:12px 16px;font-size:14px}
+  .topbar a{color:#fff;text-decoration:none;font-weight:600}
+  main{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+  h1{font-size:30px;line-height:1.35;letter-spacing:-.02em;margin:10px 0 6px}
+  h2{font-size:23px;margin:48px 0 12px;padding-top:12px;border-top:1px solid var(--line);letter-spacing:-.01em}
+  h3{font-size:19px;margin:32px 0 8px}
+  a{color:var(--accent)}
+  img{max-width:100%;height:auto!important;width:auto!important;display:block;margin:18px auto;border-radius:8px;background:#fff}
+  figure{margin:22px 0}figcaption{text-align:center;color:var(--dim);font-size:14px}
+  table{border-collapse:collapse;width:100%;font-size:15px;margin:16px 0;display:block;overflow-x:auto}
+  th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--chip)}
+  code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em}
+  pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto}
+  blockquote{margin:16px 0;padding:10px 16px;border-left:4px solid var(--accent);background:var(--chip);border-radius:0 8px 8px 0}
+  .katex-display{overflow-x:auto;overflow-y:hidden;padding:4px 0}
+  nav#TOC{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 20px;margin:20px 0 8px;font-size:15px}
+  nav#TOC ul{padding-left:18px;margin:4px 0}
+  nav#TOC>ul{padding-left:0;list-style:none}
+  nav#TOC h2{margin:0 0 4px;padding:0;border:0;font-size:16px}
+  nav#TOC>ul>li>a{display:none}
+  nav#TOC>ul>li>ul{padding-left:0;list-style:none}
+  nav#TOC a{text-decoration:none}
+  header#title-block-header{margin:8px 0 0}
+  header#title-block-header .subtitle{color:var(--dim);font-size:17px;margin:0 0 6px;font-weight:500}
+  header#title-block-header .author,header#title-block-header .date{display:inline;color:var(--dim);font-size:14px;margin:0 10px 0 0}
+  pre.mermaid{background:var(--panel);border:1px solid var(--line);text-align:center}
+  nav#TOC>ul>li>a{display:inline}
+  nav#TOC>ul>li{margin-top:4px}
+  nav#TOC ul ul{font-size:14px}
+  .notice{border:1px solid #b7791f;border-left-width:5px;background:var(--panel);border-radius:10px;padding:12px 16px;margin:18px 0 6px;font-size:15px;line-height:1.7}
+  .notice strong{color:#b7791f}
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" />
+</head>
+<body>
+<div class="topbar"><a href="../">← 액티브 리스크 배분</a> · 실행 부록 노트</div><main>
+<header id="title-block-header">
+<h1 class="title">부록 — 리스크 예산에서 실제 실행까지</h1>
+<p class="date">2026-09-25</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<h2 id="toc-title">목차</h2>
+<ul>
+<li><a href="#te-합산-원칙과-본문-배분표의-정정"
+id="toc-te-합산-원칙과-본문-배분표의-정정">1. TE 합산 원칙과 본문
+배분표의 정정</a></li>
+<li><a href="#실행-3단계" id="toc-실행-3단계">2. 실행 3단계</a></li>
+<li><a href="#간단-예제-1000억원-100bp-두-전략"
+id="toc-간단-예제-1000억원-100bp-두-전략">3. 간단 예제 — 1,000억원,
+100bp, 두 전략</a></li>
+<li><a href="#실무-규모-예제-1조원-400bp-상한이-걸릴-때"
+id="toc-실무-규모-예제-1조원-400bp-상한이-걸릴-때">4. 실무 규모 예제 —
+1조원, 400bp, 상한이 걸릴 때</a></li>
+<li><a href="#계기별-환산-160-148-78bp를-무엇으로-바꾸나"
+id="toc-계기별-환산-160-148-78bp를-무엇으로-바꾸나">5. 계기별 환산 — 160
+/ 148 / 78bp를 무엇으로 바꾸나</a></li>
+<li><a href="#실제로-움직이는-현금" id="toc-실제로-움직이는-현금">6.
+실제로 움직이는 현금</a></li>
+<li><a href="#사후-검산과-tc-실측" id="toc-사후-검산과-tc-실측">7. 사후
+검산과 TC 실측</a></li>
+<li><a href="#위원회-점검-항목" id="toc-위원회-점검-항목">8. 위원회 점검
+항목</a></li>
+<li><a href="#부록-a.-계기별-민감도-참고값"
+id="toc-부록-a.-계기별-민감도-참고값">부록 A. 계기별 민감도
+참고값</a></li>
+<li><a href="#부록-b.-기호-정리" id="toc-부록-b.-기호-정리">부록 B. 기호
+정리</a></li>
+</ul>
+</nav>
+<blockquote>
+<p><strong>결론.</strong> 리스크 예산 배분과 자금 배분은 다른 단계다.
+최적화가 내놓는 슬리브별 트래킹 에러는 금액이 아니라 포지션 크기를
+정하는 스케일 계수이고, 실행은 대부분 파생상품 오버레이로 한다. 벤치마크
+복제 현물 포트폴리오는 그대로 두고 그 위에 액티브 포지션을 얹으며,
+실제로 나가는 현금은 증거금과 담보뿐이다 — 통상 운용자산의 1~4%
+수준이다.</p>
+</blockquote>
+<p>변환 공식은 하나다.</p>
+<p><span class="math display">
+\text{포지션 크기} \;=\; \frac{TE_i}{\sigma(\text{리스크 요인})}
+</span></p>
+<p>트래킹 에러 80bp를 금리 변동성 연 1.0%로 나누면 액티브 듀레이션
+0.8년이 되고, 이를 DV01로 환산하면 국채선물 계약 수가 나온다. 이 부록은
+그 세 번의 환산을 수치로 따라간다.</p>
+<hr />
+<h2 id="te-합산-원칙과-본문-배분표의-정정">1. TE 합산 원칙과 본문
+배분표의 정정</h2>
+<p>슬리브별 트래킹 에러는 <strong>산술합이 아니라 제곱합</strong>으로
+더해진다.</p>
+<p><span class="math display">
+\sigma_A \;=\; \sqrt{\textstyle\sum_i TE_i^2} \quad (\text{독립 가정}),
+\qquad \sigma_A \;=\; \sqrt{TE^\top C\, TE} \quad (\text{일반})
+</span></p>
+<h3 id="본문-덱의-배분표를-정정한다">1.1 본문 덱의 배분표를
+정정한다</h3>
+<p>설명자료 27장의 배분 결과표는 155 + 105 + 0 + 55 = 400bp로 적었다.
+이것은 산술합이며 제곱합 기준으로는 400bp가 아니다.</p>
+<p><span class="math display">
+\sqrt{155^2 + 105^2 + 55^2} \;=\; \sqrt{38{,}075} \;=\; 195\text{bp}
+</span></p>
+<p>즉 그 표는 총 액티브 리스크 400bp가 아니라 <strong>195bp를 쓴
+배분</strong>이다. 승인된 400bp를 제대로 채우려면 최적해를 다시 풀어야
+한다.</p>
+<h3 id="무제약-최적해-재계산">1.2 무제약 최적해 재계산</h3>
+<p>유효 IR 벡터를 <span class="math inline">a_i = IR_i^{\text{ante}}
+\times View_i</span> 로 둔다.</p>
+<table>
+<thead>
+<tr>
+<th>슬리브</th>
+<th>사전 IR</th>
+<th>View</th>
+<th><span class="math inline">a_i</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>듀레이션</td>
+<td>0.093</td>
+<td>+2</td>
+<td>0.186</td>
+</tr>
+<tr>
+<td>FX</td>
+<td>0.076</td>
+<td>+1</td>
+<td>0.076</td>
+</tr>
+<tr>
+<td>주식 국가배분</td>
+<td>0.026</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>크레딧</td>
+<td>0.040</td>
+<td>+1</td>
+<td>0.040</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">
+TE^\star \;=\; \sigma_A \frac{a}{\lVert a \rVert}, \qquad \lVert a
+\rVert \;=\; \sqrt{0.186^2 + 0.076^2 + 0.040^2} \;=\; 0.2049
+</span></p>
+<table>
+<thead>
+<tr>
+<th>슬리브</th>
+<th>무제약 최적 TE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>듀레이션</td>
+<td>363bp</td>
+</tr>
+<tr>
+<td>FX</td>
+<td>148bp</td>
+</tr>
+<tr>
+<td>크레딧</td>
+<td>78bp</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">
+\sqrt{363^2 + 148^2 + 78^2} \;=\; 400\text{bp}
+</span></p>
+<p>이것이 승인된 리스크 예산을 정확히 소진하는 배분이다. 다만 슬리브
+상한이 걸리면 이 해는 쓸 수 없다 (§4).</p>
+<hr />
+<h2 id="실행-3단계">2. 실행 3단계</h2>
+<h3 id="슬리브마다-단위-리스크-구조를-정의한다">2.1 슬리브마다 단위
+리스크 구조를 정의한다</h3>
+<p>각 슬리브에는 그 뷰를 표현하는 포지션 모양이 미리 정해져 있다. 이를
+트래킹 에러 1단위로 정규화한 벡터로 둔다.</p>
+<p><span class="math display">
+\sqrt{u_i^\top \Sigma\, u_i} \;=\; 1
+</span></p>
+<p>예를 들어 듀레이션 슬리브의 구조는 “한국 10년 +50%, 미국 10년 +30%,
+독일 10년 +20%” 같은 상대 비중이다. 방향과 비중은 리서치가 정하고,
+<strong>크기는 아직 정해지지 않았다</strong>.</p>
+<h3 id="최적화가-준-te로-크기를-정한다">2.2 최적화가 준 TE로 크기를
+정한다</h3>
+<p><span class="math display">
+w_i^A \;=\; TE_i \cdot \mathrm{sign}(View_i) \cdot u_i, \qquad w^A \;=\;
+\sum_i w_i^A
+</span></p>
+<p>이 단계가 리스크 예산을 포지션으로 바꾸는 변환이다. 구조는 그대로
+두고 크기만 스케일한다.</p>
+<h3 id="제약에-투영한다">2.3 제약에 투영한다</h3>
+<p>벤치마크와 액티브 포지션의 합이 롱온리·종목 상한·회전율·유동성 제약을
+위반하면 가장 가까운 실행 가능 포트폴리오로 투영한다. <strong>여기서
+잃는 부분이 정확히 TC다.</strong></p>
+<p><span class="math display">
+TC_i \;=\; \mathrm{corr}\!\left(w_i^{A,\text{target}},\;
+w_i^{A,\text{actual}}\right)
+</span></p>
+<p>사전에 가정한 TC와 실측 TC를 대조하는 것이 사후 루프의 핵심
+항목이다.</p>
+<hr />
+<h2 id="간단-예제-1000억원-100bp-두-전략">3. 간단 예제 — 1,000억원,
+100bp, 두 전략</h2>
+<p>펀드 1,000억원, 승인된 액티브 리스크 100bp. 최적화 결과는 다음과
+같다.</p>
+<table>
+<thead>
+<tr>
+<th>전략</th>
+<th>배분 TE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>금리 (듀레이션 늘리기)</td>
+<td>80bp</td>
+</tr>
+<tr>
+<td>달러 (달러 매수)</td>
+<td>60bp</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">
+\sqrt{80^2 + 60^2} \;=\; 100\text{bp}
+</span></p>
+<h3 id="te를-포지션-크기로">3.1 TE를 포지션 크기로</h3>
+<table>
+<thead>
+<tr>
+<th>전략</th>
+<th>TE</th>
+<th>요인 변동성</th>
+<th>포지션 크기</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>금리</td>
+<td>0.8%</td>
+<td>금리 연 1.0%</td>
+<td>액티브 듀레이션 <strong>+0.8년</strong></td>
+</tr>
+<tr>
+<td>달러</td>
+<td>0.6%</td>
+<td>환율 연 10%</td>
+<td>달러 노출 <strong>6%</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="포지션-크기를-계기로">3.2 포지션 크기를 계기로</h3>
+<p><strong>금리</strong> — 듀레이션 0.8년을 금리 1bp당 손익
+민감도(DV01)로 환산한다.</p>
+<p><span class="math display">
+1{,}000\text{억} \times 0.8 \times 0.0001 \;=\; 800\text{만원/bp}
+</span></p>
+<p>국채선물 10년물 1계약의 DV01이 8만원이므로 <strong>100계약
+매수</strong>.</p>
+<p><strong>달러</strong> — 펀드의 6%인 <strong>60억원</strong> 선물환
+매수.</p>
+<h3 id="실제로-나가는-현금">3.3 실제로 나가는 현금</h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>현금</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>국채선물 위탁증거금 (100계약)</td>
+<td>약 3억</td>
+</tr>
+<tr>
+<td>선물환 담보 (60억의 2%)</td>
+<td>약 1.2억</td>
+</tr>
+<tr>
+<td><strong>합계</strong></td>
+<td><strong>약 4.2억원 — 펀드의 0.4%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>나머지 996억원은 벤치마크 포트폴리오 그대로 둔다. 리스크 예산은
+자금을 옮기는 것이 아니라 <strong>선물로 얹는 것</strong>이다.</p>
+<blockquote>
+<p>TE 80bp → 변동성으로 나누면 듀레이션 0.8년 → DV01로 환산하면 선물
+100계약 → 현금은 증거금 3억만 나간다.</p>
+</blockquote>
+<hr />
+<h2 id="실무-규모-예제-1조원-400bp-상한이-걸릴-때">4. 실무 규모 예제 —
+1조원, 400bp, 상한이 걸릴 때</h2>
+<p>운용자산 1조원, 승인된 총 액티브 리스크 400bp, 슬리브 상한은 총
+리스크의 40%인 160bp. §1.2의 무제약 최적해는 듀레이션 363bp였으므로
+<strong>상한에 걸린다</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>슬리브</th>
+<th>무제약</th>
+<th>상한 적용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>듀레이션</td>
+<td>363bp</td>
+<td><strong>160bp (상한 구속)</strong></td>
+</tr>
+<tr>
+<td>FX</td>
+<td>148bp</td>
+<td>148bp</td>
+</tr>
+<tr>
+<td>크레딧</td>
+<td>78bp</td>
+<td>78bp</td>
+</tr>
+<tr>
+<td>총 액티브 리스크</td>
+<td>400bp</td>
+<td><strong>231bp</strong></td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">
+\sqrt{160^2 + 148^2 + 78^2} \;=\; \sqrt{53{,}588} \;=\; 231\text{bp}
+</span></p>
+<p>승인된 400bp 중 <strong>169bp가 쓰이지 않는다</strong>. 이것은 오류가
+아니라 규율의 결과다.</p>
+<h3 id="미사용-리스크-예산을-어떻게-볼-것인가">4.1 미사용 리스크 예산을
+어떻게 볼 것인가</h3>
+<p>뷰가 있는 슬리브가 셋뿐이고 각각 상한이 160bp라면 이론적 최대치도
+400bp에 미치지 못한다.</p>
+<p><span class="math display">
+\sqrt{3 \times 160^2} \;=\; 277\text{bp} \;&lt;\; 400\text{bp}
+</span></p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>선택</th>
+<th>내용</th>
+<th>평가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>그대로 남긴다</td>
+<td>231bp만 쓰고 169bp는 미사용</td>
+<td>뷰가 있는 만큼만 쓴다는 원칙에 부합</td>
+</tr>
+<tr>
+<td>상한을 올린다</td>
+<td>40% → 60% (240bp)</td>
+<td>듀레이션 집중도가 올라간다</td>
+</tr>
+<tr>
+<td>슬리브를 늘린다</td>
+<td>뷰를 내는 전략을 추가</td>
+<td>breadth가 실제로 늘어야 의미가 있다</td>
+</tr>
+</tbody>
+</table>
+<p>권장은 첫째다. 승인된 리스크를 다 쓰는 것이 목표가 아니라
+<strong>확신이 있는 곳에만 쓰는 것</strong>이 목표다. 미사용 169bp는
+위원회에 보고할 항목이며 숨길 수치가 아니다.</p>
+<hr />
+<h2 id="계기별-환산-160-148-78bp를-무엇으로-바꾸나">5. 계기별 환산 — 160
+/ 148 / 78bp를 무엇으로 바꾸나</h2>
+<h3 id="차-환산-요인-노출">5.1 1차 환산 — 요인 노출</h3>
+<table>
+<thead>
+<tr>
+<th>슬리브</th>
+<th>TE</th>
+<th>요인 변동성</th>
+<th>요인 노출</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>듀레이션</td>
+<td>1.60%</td>
+<td>금리 80bp/년</td>
+<td>액티브 듀레이션 <strong>+2.00년</strong></td>
+</tr>
+<tr>
+<td>FX</td>
+<td>1.48%</td>
+<td>통화 바스켓 8%/년</td>
+<td>노셔널 <strong>18.5%</strong></td>
+</tr>
+<tr>
+<td>크레딧</td>
+<td>0.78%</td>
+<td>IG 스프레드 40bp/년</td>
+<td>스프레드 듀레이션 <strong>+1.95년</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="듀레이션-dv01과-계약-수">5.2 듀레이션 — DV01과 계약 수</h3>
+<p><span class="math display">
+1\text{조원} \times 2.00 \times 0.0001 \;=\; 2.0\text{억원/bp}
+</span></p>
+<p>슬리브 구조가 한국 50 / 미국 30 / 독일 20이라면:</p>
+<table>
+<thead>
+<tr>
+<th>계기</th>
+<th>계약당 DV01</th>
+<th>배분 DV01</th>
+<th>계약 수</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KTB 10년 선물</td>
+<td>8.0만원</td>
+<td>1.00억</td>
+<td><strong>1,250계약</strong></td>
+</tr>
+<tr>
+<td>US 10Y Note</td>
+<td>10.1만원</td>
+<td>0.60억</td>
+<td><strong>594계약</strong></td>
+</tr>
+<tr>
+<td>Euro-Bund</td>
+<td>11.6만원</td>
+<td>0.40억</td>
+<td><strong>345계약</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="fx와-크레딧">5.3 FX와 크레딧</h3>
+<p><strong>FX</strong> — 노셔널 18.5%는 곧 금액이다.</p>
+<p><span class="math display">
+1\text{조원} \times 0.185 \;=\; 1{,}850\text{억원 선물환 매수}
+</span></p>
+<p><strong>크레딧</strong> — 스프레드 듀레이션을 계기의 스프레드
+듀레이션으로 나눈다. CDX IG 5년의 스프레드 듀레이션이 4.6년이라면:</p>
+<p><span class="math display">
+1\text{조원} \times \frac{1.95}{4.6} \;=\; 4{,}239\text{억원 노셔널
+(프로텍션 매도)}
+</span></p>
+<p>노셔널이 운용자산의 42%로 커 보이지만 실제 리스크는 78bp다.
+<strong>노셔널 규모가 아니라 리스크 기여로 판단해야 하는 이유</strong>가
+여기 있다.</p>
+<hr />
+<h2 id="실제로-움직이는-현금">6. 실제로 움직이는 현금</h2>
+<h3 id="증거금과-담보-소요">6.1 증거금과 담보 소요</h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>규모</th>
+<th>소요율</th>
+<th>현금</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>국채선물 3종 (2,189계약)</td>
+<td>—</td>
+<td>계약당 약 300만원</td>
+<td>약 66억</td>
+</tr>
+<tr>
+<td>선물환 담보</td>
+<td>1,850억</td>
+<td>2%</td>
+<td>약 37억</td>
+</tr>
+<tr>
+<td>CDX IG 초기증거금</td>
+<td>4,239억</td>
+<td>5%</td>
+<td>약 212억</td>
+</tr>
+<tr>
+<td><strong>합계</strong></td>
+<td></td>
+<td></td>
+<td><strong>약 315억원 — 운용자산의 3.2%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>나머지 9,685억원은 벤치마크 복제 현물 포트폴리오 그대로 둔다. 액티브
+가중치의 합은 0으로 유지된다.</p>
+<p><span class="math display">
+\sum_j w_j^A \;=\; 0 \qquad (\text{자기금융 오버레이})
+</span></p>
+<h3 id="자금이-실제로-움직여야-하는-경우">6.2 자금이 실제로 움직여야
+하는 경우</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>상황</th>
+<th>이유</th>
+<th>대응</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>파생상품 시장이 없는 슬리브</td>
+<td>일부 신흥국 현물, 회사채 개별종목</td>
+<td>현물 매매 — 여기서 TC가 크게 떨어진다</td>
+</tr>
+<tr>
+<td>담보 소요 증가</td>
+<td>리스크 예산 확대 또는 마진콜</td>
+<td>현금성 자산 버퍼를 사전에 확보</td>
+</tr>
+<tr>
+<td>롤 비용 누적</td>
+<td>선물환·선물 만기 롤</td>
+<td>알파 추정에서 비용을 차감</td>
+</tr>
+</tbody>
+</table>
+<h3 id="현금-버퍼가-만드는-트래킹-에러">6.3 현금 버퍼가 만드는 트래킹
+에러</h3>
+<p>담보 소요의 2배를 현금성 자산으로 유지하는 것이 통상적이다. 위
+예시라면 630억원, 운용자산의 6.3% 수준이다. 이 버퍼는 벤치마크 대비 현금
+비중 초과이므로 <strong>그 자체가 트래킹 에러를 만든다</strong>. 리스크
+예산에 포함해 계산해야 하며, 빠뜨리면 실현 TE가 설계치를 초과한다.</p>
+<hr />
+<h2 id="사후-검산과-tc-실측">7. 사후 검산과 TC 실측</h2>
+<h3 id="체결-후-실현-te를-되짚는다">7.1 체결 후 실현 TE를 되짚는다</h3>
+<p><span class="math display">
+\sqrt{w^{A\top}\Sigma\, w^{A}} \;\overset{?}{=}\; 231\text{bp}
+</span></p>
+<p>크레딧에서 유동성 제약으로 목표 4,239억 중 3,000억만 체결됐다고
+하자.</p>
+<p><span class="math display">
+TE_{\text{크레딧}}^{\text{실현}} \;=\; 78 \times \frac{3{,}000}{4{,}239}
+\;=\; 55\text{bp}, \qquad TC \;=\; 0.71
+</span></p>
+<table>
+<thead>
+<tr>
+<th>슬리브</th>
+<th>목표 TE</th>
+<th>실현 TE</th>
+<th>실측 TC</th>
+<th>사전 가정 TC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>듀레이션</td>
+<td>160bp</td>
+<td>160bp</td>
+<td>1.00</td>
+<td>0.75</td>
+</tr>
+<tr>
+<td>FX</td>
+<td>148bp</td>
+<td>148bp</td>
+<td>1.00</td>
+<td>0.80</td>
+</tr>
+<tr>
+<td>크레딧</td>
+<td>78bp</td>
+<td>55bp</td>
+<td>0.71</td>
+<td>0.50</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">
+\sqrt{160^2 + 148^2 + 55^2} \;=\; 222\text{bp} \qquad (\text{설계치 }
+231\text{bp})
+</span></p>
+<h3 id="괴리의-원인을-구분한다">7.2 괴리의 원인을 구분한다</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>증상</th>
+<th>원인</th>
+<th>조치</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>실현 TE가 설계치보다 낮다</td>
+<td>체결 미달 — TC 문제</td>
+<td>집행 절차·유동성 점검</td>
+</tr>
+<tr>
+<td>실현 TE가 설계치보다 높다</td>
+<td>구조 정규화 오류 또는 상관 추정 오류</td>
+<td>단위 리스크 구조와 공분산 재검증</td>
+</tr>
+<tr>
+<td>슬리브별로는 맞는데 합계가 어긋난다</td>
+<td>슬리브 간 상관행렬 불일치</td>
+<td>실현 상관으로 재추정</td>
+</tr>
+<tr>
+<td>현금 버퍼가 TE를 만든다</td>
+<td>담보용 현금이 리스크 예산에서 빠졌다</td>
+<td>버퍼를 슬리브로 등록</td>
+</tr>
+</tbody>
+</table>
+<h3 id="실측-tc가-사전-가정보다-높게-나온-경우">7.3 실측 TC가 사전
+가정보다 높게 나온 경우</h3>
+<p>위 예시에서 실측 TC 0.71은 사전 가정 0.50보다 높다. 이번 분기에
+유동성이 좋았다는 뜻이므로, 한 분기 결과만으로 사전값을 0.71로 올리지
+않는다. <strong>수축 원칙을 적용한다.</strong></p>
+<p><span class="math display">
+TC^{\text{new}} \;=\; w \cdot TC^{\text{realized}} + (1-w) \cdot
+TC^{\text{prior}}, \qquad w \;=\; \frac{T}{T + T_0}
+</span></p>
+<p>분기 데이터 4개(1년), 기준 12개(3년)라면 가중치는 0.25이므로 새
+사전값은 0.55다. 사전값이 실측을 따라가는 속도를 통제하는 것이 이 항의
+역할이다.</p>
+<hr />
+<h2 id="위원회-점검-항목">8. 위원회 점검 항목</h2>
+<h3 id="실행-단계에서-승인하는-것">8.1 실행 단계에서 승인하는 것</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>항목</th>
+<th>예시</th>
+<th>왜 위원회 사안인가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>파생상품 사용 범위</td>
+<td>국채선물·선물환·CDX 인덱스</td>
+<td>계기가 늘어나면 운영 리스크와 상대방 리스크가 늘어난다</td>
+</tr>
+<tr>
+<td>노셔널 상한</td>
+<td>운용자산의 50%</td>
+<td>리스크는 작아도 노셔널이 크면 담보·회계 이슈가 생긴다</td>
+</tr>
+<tr>
+<td>현금 버퍼 하한</td>
+<td>담보 소요의 2배</td>
+<td>마진콜에 강제 청산되면 뷰가 아니라 유동성이 손실을 만든다</td>
+</tr>
+<tr>
+<td>미사용 리스크 예산 허용</td>
+<td>승인치의 50% 이상 미사용 시 보고</td>
+<td>예산을 채우려는 압력이 규율을 무너뜨린다</td>
+</tr>
+</tbody>
+</table>
+<h3 id="분기마다-보고받을-것">8.2 분기마다 보고받을 것</h3>
+<table>
+<thead>
+<tr>
+<th>보고 항목</th>
+<th>형태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>슬리브별 목표 TE 대비 실현 TE</td>
+<td>표 — 괴리와 원인</td>
+</tr>
+<tr>
+<td>실측 TC와 사전 가정의 차이</td>
+<td>표 — 수축 후 새 사전값</td>
+</tr>
+<tr>
+<td>총 실현 TE 대 승인 리스크</td>
+<td>한 줄 — 미사용 예산 규모</td>
+</tr>
+<tr>
+<td>노셔널과 담보 소요</td>
+<td>표 — 상한 대비</td>
+</tr>
+<tr>
+<td>롤 비용과 거래비용</td>
+<td>한 줄 — 알파에서 차감된 금액</td>
+</tr>
+</tbody>
+</table>
+<h3 id="한-장으로-보는-실행-흐름">8.3 한 장으로 보는 실행 흐름</h3>
+<p><span class="math display">
+TE_i \;\xrightarrow[\;\div\,\sigma(\text{요인})\;]{}\; \text{요인 노출}
+\;\xrightarrow[\;\times\,\text{계기 민감도}\;]{}\; \text{계약 수}
+\;\xrightarrow[\;\text{제약 투영}\;]{}\; \text{실현 } TE_i
+</span></p>
+<p>마지막 화살표에서 잃는 만큼이 TC이고, 그 값을 다음 분기 사전 IR에
+되먹인다. 이 고리가 닫혀 있어야 모형이 시간이 갈수록 실현값에
+수렴한다.</p>
+<hr />
+<h2 id="부록-a.-계기별-민감도-참고값">부록 A. 계기별 민감도 참고값</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>계기</th>
+<th>계약 규모</th>
+<th>민감도</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KTB 10년 선물</td>
+<td>1억원</td>
+<td>DV01 약 8.0만원</td>
+<td>듀레이션 약 8년</td>
+</tr>
+<tr>
+<td>KTB 3년 선물</td>
+<td>1억원</td>
+<td>DV01 약 2.8만원</td>
+<td>듀레이션 약 2.8년</td>
+</tr>
+<tr>
+<td>US 10Y Note</td>
+<td>액면 USD 100,000</td>
+<td>DV01 약 USD 75</td>
+<td>환율 1,350원 기준 10.1만원</td>
+</tr>
+<tr>
+<td>Euro-Bund</td>
+<td>액면 EUR 100,000</td>
+<td>DV01 약 EUR 75</td>
+<td>환율 1,450원 기준 11.6만원</td>
+</tr>
+<tr>
+<td>CDX IG 5년</td>
+<td>노셔널 기준</td>
+<td>스프레드 듀레이션 약 4.6년</td>
+<td>시리즈에 따라 변동</td>
+</tr>
+<tr>
+<td>iTraxx Main 5년</td>
+<td>노셔널 기준</td>
+<td>스프레드 듀레이션 약 4.7년</td>
+<td>시리즈에 따라 변동</td>
+</tr>
+</tbody>
+</table>
+<p>계약 규모와 민감도는 거래소 명세와 시장 수준에 따라 달라지므로 실행
+시점에 재확인한다.</p>
+<h2 id="부록-b.-기호-정리">부록 B. 기호 정리</h2>
+<table>
+<thead>
+<tr>
+<th>기호</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math inline">TE_i</span></td>
+<td>슬리브 <span class="math inline">i</span> 에 배분된 트래킹 에러</td>
+</tr>
+<tr>
+<td><span class="math inline">\sigma_A</span></td>
+<td>승인된 총 액티브 리스크</td>
+</tr>
+<tr>
+<td><span class="math inline">u_i</span></td>
+<td>슬리브 <span class="math inline">i</span> 의 단위 리스크 구조 (TE
+1단위로 정규화)</td>
+</tr>
+<tr>
+<td><span class="math inline">w_i^A</span></td>
+<td>슬리브 <span class="math inline">i</span> 의 액티브 가중치 벡터</td>
+</tr>
+<tr>
+<td><span class="math inline">\Sigma</span></td>
+<td>자산 수준 공분산 행렬</td>
+</tr>
+<tr>
+<td><span class="math inline">C</span></td>
+<td>슬리브 간 상관행렬</td>
+</tr>
+<tr>
+<td><span class="math inline">TC_i</span></td>
+<td>전이계수 — 목표 포지션 대비 실제 포지션의 상관</td>
+</tr>
+<tr>
+<td>DV01</td>
+<td>금리 1bp 변동당 손익</td>
+</tr>
+<tr>
+<td><span class="math inline">T_0</span></td>
+<td>수축 기준 표본 수 (통상 12분기)</td>
+</tr>
+</tbody>
+</table>
+</main>
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+mermaid.initialize({startOnLoad: true, theme: dark ? "dark" : "neutral", fontFamily: "Pretendard, sans-serif"});
+</script>
+</body>
+</html>

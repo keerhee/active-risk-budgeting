@@ -1,0 +1,5 @@
+*.pptx
+*.docx
+*.key
+.DS_Store
+~$*
