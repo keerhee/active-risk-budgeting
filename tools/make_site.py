@@ -27,7 +27,7 @@ PARTS = [
      "실행 오버레이 overlay dv01 계약 선물 증거금 담보 현금 버퍼 실현 te 검산 tc 실측"),
     ("CODE", "m3", "구현", "Claude Code 구현 가이드 — 리스크 예산에서 선물 계약까지",
      "개요 · 준비 · 배분 · 보정 · 실행 · 운영",
-     "Risk_Budgeting_Claude_Code_Implementation", None,
+     "Risk_Budgeting_Implementation_Claude_Code", None,
      "사용자 프롬프트 15개로 따라가는 구현 — 저장소·규칙·입력 등록부 → 닫힌 해와 손계산 테스트 → 보정·상한 → 계약 수·현금 → 사후 검산·수축·/quarterly",
      None,
      "claude code 프롬프트 prompt 구현 자동화 claude.md yaml pytest 테스트 quarterly 보고서 수축 체결 계약 수"),

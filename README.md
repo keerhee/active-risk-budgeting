@@ -49,7 +49,7 @@ JJ 브리프 덱. 메인식은 Ostrum / EDHEC-Risk 원자료의 식을 그대로
 
 ### Claude Code 구현 가이드 (36장)
 
-[슬라이드 PDF](decks/Risk_Budgeting_Claude_Code_Implementation.pdf)
+[슬라이드 PDF](decks/Risk_Budgeting_Implementation_Claude_Code.pdf)
 
 리스크 예산 배분에서 계약 수 · 증거금 · 사후 검산까지를 Claude Code로 구현하는 절차. 사용자가 입력하는 프롬프트 15개가 중심이다.
 
