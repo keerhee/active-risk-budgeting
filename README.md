@@ -47,7 +47,7 @@ JJ 브리프 덱. 메인식은 Ostrum / EDHEC-Risk 원자료의 식을 그대로
 핵심 주장 — 리스크 예산 배분과 자금 배분은 다른 단계다. 배분 TE는 금액이 아니라
 포지션 크기의 스케일 계수이며, 1조원 기준 실제로 움직이는 현금은 증거금과 담보 315억원뿐이다.
 
-### Claude Code 구현 가이드 (34장)
+### Claude Code 구현 가이드 (36장)
 
 [슬라이드 PDF](decks/Risk_Budgeting_Claude_Code_Implementation.pdf)
 
